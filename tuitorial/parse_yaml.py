@@ -331,12 +331,16 @@ def run_from_yaml(
     chapter_index: int | None = None,
     step_index: int = 0,
     theme: str | None = None,
+    bindings: str = "arrow",
 ) -> None:  # pragma: no cover
     """Parses a YAML config and runs the tutorial."""
     chapters, title_slide = parse_yaml_config(yaml_file)
     app = TuitorialApp(chapters, title_slide, chapter_index, step_index)
     if theme is not None:
         app.theme = theme
+    if bindings == "vi":
+        app.bind("down", "next_focus", description="Next Focus")
+        app.bind("up", "previous_focus", description="Previous Focus")
     app.run()
 
 
@@ -387,12 +391,16 @@ def run_dev_mode(
     chapter_index: int | None = None,
     step_index: int = 0,
     theme: str | None = None,
+    bindings: str = "arrow",
 ) -> None:  # pragma: no cover
     """Parses a YAML config, runs the tutorial, and watches for changes."""
     chapters, title_slide = parse_yaml_config(yaml_file)
     app = TuitorialApp(chapters, title_slide, chapter_index, step_index)
     if theme is not None:
         app.theme = theme
+    if bindings == "vi":
+        app.bind("down", "next_focus", description="Next Focus")
+        app.bind("up", "previous_focus", description="Previous Focus")
 
     async def run_app_and_watch() -> None:
         """Run the app and the file watcher concurrently."""
@@ -442,6 +450,13 @@ def cli() -> None:  # pragma: no cover
         default=None,
         help="Initial theme to use for the app.",
         choices=tuple(textual.theme.BUILTIN_THEMES.keys()),
+    )
+    parser.add_argument(
+        "--bindings",
+        type=str,
+        default="arrow",
+        help="Bindings to use for navigation.",
+        choices=["arrow", "vi"],
     )
     args = parser.parse_args()
 
